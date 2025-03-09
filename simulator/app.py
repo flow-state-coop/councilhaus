@@ -6,10 +6,13 @@ Streamlit app entry point for the Council funding simulation.
 import streamlit as st
 import numpy as np
 import os
+import sys
 from pathlib import Path
 
-from visualization.dashboard import run_dashboard
-from config import DEFAULT_CONFIG, DATA_PATHS
+# Add the current directory to the path to ensure imports work correctly
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
 
 # Set page title and favicon - MUST be the first Streamlit command
 st.set_page_config(
@@ -17,6 +20,10 @@ st.set_page_config(
     page_icon="💰",
     layout="wide"
 )
+
+# Import after path setup
+from visualization.dashboard import run_dashboard
+from config import DEFAULT_CONFIG, DATA_PATHS
 
 def setup_directories():
     """Create necessary directories if they don't exist."""

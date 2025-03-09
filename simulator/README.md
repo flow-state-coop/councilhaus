@@ -56,6 +56,26 @@ python main.py --batch --parameter_to_vary "Number of Members" --num_simulations
 
 Run `python main.py --help` to see all available options.
 
+## Deployment
+
+### Deploying with Streamlit Cloud (Recommended)
+
+The simulator is optimized for deployment with Streamlit Cloud:
+
+1. Fork or clone this repository to your GitHub account
+
+2. Sign up for [Streamlit Cloud](https://streamlit.io/cloud) using your GitHub account
+
+3. Create a new app:
+   - Click "New app"
+   - Select your repository
+   - Set the main file path to `simulator/app.py`
+   - Click "Deploy"
+
+4. Once deployed, your simulator will be available at the URL provided by Streamlit Cloud
+
+For detailed instructions, see [streamlit_deploy_guide.md](./streamlit_deploy_guide.md).
+
 ## Simulation Parameters
 
 ### Council Configuration
@@ -92,6 +112,9 @@ The simulator provides several metrics to evaluate funding outcomes:
 ```
 simulator/
 ├── data/                  # Store simulation results
+│   ├── results/           # Simulation results
+│   ├── figures/           # Generated figures
+│   └── configs/           # Saved configurations
 ├── models/                # Core simulation models
 │   ├── council.py         # Council model
 │   ├── member.py          # Council member model
@@ -103,6 +126,8 @@ simulator/
 ├── utils/                 # Utility functions
 │   ├── helpers.py         # Helper functions
 │   └── simulation_runner.py # Simulation runner
+├── .streamlit/            # Streamlit configuration
+│   └── config.toml        # Streamlit theme and settings
 ├── config.py              # Configuration settings
 ├── main.py                # Command-line entry point
 ├── app.py                 # Streamlit app entry point
