@@ -6,11 +6,10 @@ import {PoolConfig} from "../interfaces/GDAv1Forwarder.sol";
 import {PoolMock} from "./PoolMock.sol";
 
 contract GDAv1ForwarderMock {
-    function createPool(
-        address token,
-        address admin,
-        PoolConfig memory config
-    ) external returns (bool success, address pool) {
+    function createPool(address token, address admin, PoolConfig memory config)
+        external
+        returns (bool success, address pool)
+    {
         if (token == address(0)) {
             success = false;
             pool = address(0);

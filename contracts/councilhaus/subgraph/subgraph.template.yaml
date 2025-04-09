@@ -28,7 +28,7 @@ dataSources:
         - name: Council
           file: ./abis/Council.json
       eventHandlers:
-        - event: CouncilCreated(address,address)
+        - event: CouncilCreated(address,address,string)
           handler: handleCouncilCreated
       file: ./src/council-factory.ts
 templates:

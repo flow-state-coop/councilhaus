@@ -14,8 +14,7 @@ const deploy = async () => {
   const gdav1Forwarder = await viem.deployContract("GDAv1ForwarderMock");
 
   const council = await viem.deployContract("Council", [
-    "Spacing Guild",
-    "SPA",
+    "TEST",
     ethxTokenAddress,
     gdav1Forwarder.address,
   ]);
@@ -41,8 +40,7 @@ describe("Council Contract Tests", () => {
   describe("Deployment", () => {
     it("should deploy with the correct initial parameters", async () => {
       const { council, gdav1Forwarder } = await loadFixture(deploy);
-      expect(await council.read.name()).to.equal("Spacing Guild");
-      expect(await council.read.symbol()).to.equal("SPA");
+      expect(await council.read.metadata()).to.equal("TEST");
       expect(await council.read.distributionToken()).to.equal(ethxTokenAddress);
       expect(await council.read.gdav1Forwarder()).to.equal(
         getAddress(gdav1Forwarder.address),
@@ -53,8 +51,7 @@ describe("Council Contract Tests", () => {
       const { gdav1Forwarder } = await loadFixture(deploy);
       await expect(
         viem.deployContract("Council", [
-          "Spacing Guild",
-          "SPA",
+          "TEST",
           zeroAddress,
           gdav1Forwarder.address,
         ]),

@@ -5,8 +5,7 @@ pragma solidity ^0.8.20;
 import {Council} from "./Council.sol";
 
 contract CouncilFactory {
-
-    event CouncilCreated(address council, address pool);
+    event CouncilCreated(address council, address pool, string metadata);
 
     error GDAv1ForwarderMustBeAContract();
 
@@ -21,8 +20,7 @@ contract CouncilFactory {
     }
 
     struct DeploymentConfig {
-        string councilName;
-        string councilSymbol;
+        string metadata;
         CouncilMember[] councilMembers;
         Grantee[] grantees;
         address distributionToken;
@@ -31,18 +29,27 @@ contract CouncilFactory {
     address public immutable gdav1Forwarder;
 
     constructor(address _gdav1Forwarder) {
-        if (!isContract(_gdav1Forwarder)) revert GDAv1ForwarderMustBeAContract();
+        if (!isContract(_gdav1Forwarder)) {
+            revert GDAv1ForwarderMustBeAContract();
+        }
         gdav1Forwarder = _gdav1Forwarder;
     }
 
     function createCouncil(DeploymentConfig calldata config) public {
-        Council council = new Council(config.councilName, config.councilSymbol, config.distributionToken, gdav1Forwarder);
+        Council council = new Council(
+            config.metadata, config.distributionToken, gdav1Forwarder
+        );
 
         for (uint256 i = 0; i < config.councilMembers.length; i++) {
-            council.addCouncilMember(config.councilMembers[i].account, config.councilMembers[i].votingPower);
+            council.addCouncilMember(
+                config.councilMembers[i].account,
+                config.councilMembers[i].votingPower
+            );
         }
         for (uint256 i = 0; i < config.grantees.length; i++) {
-            council.addGrantee(config.grantees[i].name, config.grantees[i].account);
+            council.addGrantee(
+                config.grantees[i].name, config.grantees[i].account
+            );
         }
 
         council.grantRole(council.MEMBER_MANAGER_ROLE(), msg.sender);
@@ -53,7 +60,9 @@ contract CouncilFactory {
         council.revokeRole(council.GRANTEE_MANAGER_ROLE(), address(this));
         council.revokeRole(council.DEFAULT_ADMIN_ROLE(), address(this));
 
-        emit CouncilCreated(address(council), address(council.pool()));
+        emit CouncilCreated(
+            address(council), address(council.pool()), config.metadata
+        );
     }
 
     function isContract(address account) internal view returns (bool) {
@@ -63,7 +72,9 @@ contract CouncilFactory {
 
         uint256 size;
         // solhint-disable-next-line no-inline-assembly
-        assembly { size := extcodesize(account) }
+        assembly {
+            size := extcodesize(account)
+        }
         return size > 0;
     }
 }

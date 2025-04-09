@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPLv3
 pragma solidity >=0.8.4;
 
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @dev The interface for any super token pool regardless of the distribution schemes.
@@ -9,20 +9,26 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 interface ISuperfluidPool is IERC20 {
     // Custom Errors
 
-    error SUPERFLUID_POOL_INVALID_TIME();               // 0x83c35016
-    error SUPERFLUID_POOL_NO_POOL_MEMBERS();            // 0xe10f405a
-    error SUPERFLUID_POOL_NO_ZERO_ADDRESS();            // 0x54eb6ee6
-    error SUPERFLUID_POOL_NOT_POOL_ADMIN_OR_GDA();      // 0x1c5fbdcb
-    error SUPERFLUID_POOL_NOT_GDA();                    // 0xfcbe3f9e
+    error SUPERFLUID_POOL_INVALID_TIME(); // 0x83c35016
+    error SUPERFLUID_POOL_NO_POOL_MEMBERS(); // 0xe10f405a
+    error SUPERFLUID_POOL_NO_ZERO_ADDRESS(); // 0x54eb6ee6
+    error SUPERFLUID_POOL_NOT_POOL_ADMIN_OR_GDA(); // 0x1c5fbdcb
+    error SUPERFLUID_POOL_NOT_GDA(); // 0xfcbe3f9e
     error SUPERFLUID_POOL_TRANSFER_UNITS_NOT_ALLOWED(); // 0x2285efba
-    error SUPERFLUID_POOL_SELF_TRANSFER_NOT_ALLOWED();  // 0xceddc0be
+    error SUPERFLUID_POOL_SELF_TRANSFER_NOT_ALLOWED(); // 0xceddc0be
 
     // Events
     event MemberUnitsUpdated(
-        address indexed token, address indexed member, uint128 oldUnits, uint128 newUnits
+        address indexed token,
+        address indexed member,
+        uint128 oldUnits,
+        uint128 newUnits
     );
     event DistributionClaimed(
-        address indexed token, address indexed member, int256 claimedAmount, int256 totalClaimed
+        address indexed token,
+        address indexed member,
+        int256 claimedAmount,
+        int256 totalClaimed
     );
 
     /// @notice A boolean indicating whether pool members can transfer their units
@@ -63,30 +69,47 @@ interface ISuperfluidPool is IERC20 {
 
     /// @notice The balance of all the disconnected members at `time`
     /// @param time The time to query
-    function getDisconnectedBalance(uint32 time) external view returns (int256 balance);
+    function getDisconnectedBalance(uint32 time)
+        external
+        view
+        returns (int256 balance);
 
     /// @notice The total amount received by `memberAddr` in the pool
     /// @param memberAddr The address of the member
     /// @return totalAmountReceived The total amount received by the member
-    function getTotalAmountReceivedByMember(address memberAddr) external view returns (uint256 totalAmountReceived);
+    function getTotalAmountReceivedByMember(address memberAddr)
+        external
+        view
+        returns (uint256 totalAmountReceived);
 
     /// @notice The flow rate a member is receiving from the pool
     /// @param memberAddr The address of the member
-    function getMemberFlowRate(address memberAddr) external view returns (int96);
+    function getMemberFlowRate(address memberAddr)
+        external
+        view
+        returns (int96);
 
     /// @notice The claimable balance for `memberAddr` at `time` in the pool
     /// @param memberAddr The address of the member
     /// @param time The time to query
-    function getClaimable(address memberAddr, uint32 time) external view returns (int256);
+    function getClaimable(address memberAddr, uint32 time)
+        external
+        view
+        returns (int256);
 
     /// @notice The claimable balance for `memberAddr` at `block.timestamp` in the pool
     /// @param memberAddr The address of the member
-    function getClaimableNow(address memberAddr) external view returns (int256 claimableBalance, uint256 timestamp);
+    function getClaimableNow(address memberAddr)
+        external
+        view
+        returns (int256 claimableBalance, uint256 timestamp);
 
     /// @notice Sets `memberAddr` ownedUnits to `newUnits`
     /// @param memberAddr The address of the member
     /// @param newUnits The new units for the member
-    function updateMemberUnits(address memberAddr, uint128 newUnits) external returns (bool);
+    function updateMemberUnits(address memberAddr, uint128 newUnits)
+        external
+        returns (bool);
 
     /// @notice Claims the claimable balance for `memberAddr` at `block.timestamp`
     /// @param memberAddr The address of the member
@@ -99,11 +122,15 @@ interface ISuperfluidPool is IERC20 {
     /// @param spender The address of the spender
     /// @param addedValue The amount to increase the allowance by
     /// @return true if successful
-    function increaseAllowance(address spender, uint256 addedValue) external returns (bool);
+    function increaseAllowance(address spender, uint256 addedValue)
+        external
+        returns (bool);
 
     /// @notice Decreases the allowance of `spender` by `subtractedValue`
     /// @param spender The address of the spender
     /// @param subtractedValue The amount to decrease the allowance by
     /// @return true if successful
-    function decreaseAllowance(address spender, uint256 subtractedValue) external returns (bool);
+    function decreaseAllowance(address spender, uint256 subtractedValue)
+        external
+        returns (bool);
 }

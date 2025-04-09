@@ -37,8 +37,7 @@ const deploy = async () => {
 
   // Prepare initial configuration
   const config = {
-    councilName: "Spacing Guild",
-    councilSymbol: "SPA",
+    metadata: "TEST",
     councilMembers: [
       { account: accounts[0].address, votingPower: 50n },
       { account: accounts[1].address, votingPower: 100n },

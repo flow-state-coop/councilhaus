@@ -40,13 +40,13 @@ abstract contract PoolManager {
         // Create a new pool using the GDAv1Forwarder
         (bool _success, address _pool) = GDAv1Forwarder(_gdav1Forwarder)
             .createPool(
-                _distributionToken,
-                address(this),
-                PoolConfig({
-                    transferabilityForUnitsOwner: false,
-                    distributionFromAnyAddress: true
-                })
-            );
+            _distributionToken,
+            address(this),
+            PoolConfig({
+                transferabilityForUnitsOwner: false,
+                distributionFromAnyAddress: true
+            })
+        );
         // Revert if pool creation fails
         if (!_success) revert PoolCreationFailed();
         // Initialize the pool instance
@@ -77,9 +77,11 @@ abstract contract PoolManager {
     // @param _member The address of the member
     // @return allocation The allocation for the member
     // @return sum The total sum of allocations
-    function _getAllocation(
-        address _member
-    ) internal view returns (Allocation memory, uint256) {
+    function _getAllocation(address _member)
+        internal
+        view
+        returns (Allocation memory, uint256)
+    {
         InternalAllocation storage allocation = _internalAllocations[_member];
         // Count valid grantees
         uint256 count = 0;
@@ -112,17 +114,15 @@ abstract contract PoolManager {
     // @dev function to set the allocation for a member
     // @param _member The address of the member
     // @param _newAllocation The new allocation to be set
-    function _setAllocation(
-        address _member,
-        Allocation memory _newAllocation
-    ) internal {
+    function _setAllocation(address _member, Allocation memory _newAllocation)
+        internal
+    {
         // First, remove old allocations from the pool
         InternalAllocation storage _allocation = _internalAllocations[_member];
         for (uint256 i = 0; i < _allocation.granteeIds.length; i++) {
             if (granteeAddresses[_allocation.granteeIds[i]] != address(0)) {
-                address granteeAddress = granteeAddresses[
-                    _allocation.granteeIds[i]
-                ];
+                address granteeAddress =
+                    granteeAddresses[_allocation.granteeIds[i]];
                 pool.updateMemberUnits(
                     granteeAddress,
                     pool.getUnits(granteeAddress) - _allocation.amounts[i]
@@ -130,9 +130,8 @@ abstract contract PoolManager {
             }
         }
         // Map new allocation addresses to grantee IDs
-        uint256[] memory granteeIdsArray = new uint256[](
-            _newAllocation.accounts.length
-        );
+        uint256[] memory granteeIdsArray =
+            new uint256[](_newAllocation.accounts.length);
         for (uint256 i = 0; i < _newAllocation.accounts.length; i++) {
             address granteeAddress = _newAllocation.accounts[i];
             uint256 granteeId = granteeIds[granteeAddress];

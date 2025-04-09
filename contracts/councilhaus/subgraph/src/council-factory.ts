@@ -9,8 +9,7 @@ export function handleCouncilCreated(event: CouncilCreatedEvent): void {
 
   const councilContract = CouncilContract.bind(councilAddress);
 
-  entity.councilName = councilContract.name();
-  entity.councilSymbol = councilContract.symbol();
+  entity.metadata = event.params.metadata;
   entity.pool = event.params.pool;
   entity.distributionToken = councilContract.distributionToken();
   entity.maxAllocationsPerMember = councilContract.maxAllocationsPerMember();

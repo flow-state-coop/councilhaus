@@ -44,29 +44,31 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
 
     // Constants
     uint8 public constant MAX_ALLOCATIONS_PER_MEMBER = 10;
-    bytes32 public constant MEMBER_MANAGER_ROLE = keccak256("MEMBER_MANAGER_ROLE");
-    bytes32 public constant GRANTEE_MANAGER_ROLE = keccak256("GRANTEE_MANAGER_ROLE");
+    bytes32 public constant MEMBER_MANAGER_ROLE =
+        keccak256("MEMBER_MANAGER_ROLE");
+    bytes32 public constant GRANTEE_MANAGER_ROLE =
+        keccak256("GRANTEE_MANAGER_ROLE");
 
     // State variables
-    address public gdav1Forwarder;
     uint8 public maxAllocationsPerMember;
+    string public metadata;
+    address public gdav1Forwarder;
 
     /**
      * @dev Constructor to initialize the Council contract
-     * @param _name Name of the non-transferable token
-     * @param _symbol Symbol of the non-transferable token
+     * @param _metadata Metadata of the council
      * @param _distributionToken Address of the token used for distribution
      * @param _gdav1Forwarder Address of the GDAv1Forwarder contract
      */
     constructor(
-        string memory _name,
-        string memory _symbol,
+        string memory _metadata,
         address _distributionToken,
         address _gdav1Forwarder
     )
-        NonTransferableToken(_name, _symbol)
+        NonTransferableToken("Flow Council", "COUNCIL")
         PoolManager(_distributionToken, _gdav1Forwarder)
     {
+        metadata = _metadata;
         gdav1Forwarder = _gdav1Forwarder;
         maxAllocationsPerMember = MAX_ALLOCATIONS_PER_MEMBER;
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -78,13 +80,16 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
      * @dev Set the maximum number of allocations per member
      * @param _maxAllocationsPerMember New maximum allocations per member
      */
-    function setMaxAllocationsPerMember(
-        uint8 _maxAllocationsPerMember
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setMaxAllocationsPerMember(uint8 _maxAllocationsPerMember)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
         if (
-            _maxAllocationsPerMember <= 0 ||
-            _maxAllocationsPerMember > MAX_ALLOCATIONS_PER_MEMBER
-        ) revert InvalidMaxAllocations();
+            _maxAllocationsPerMember <= 0
+                || _maxAllocationsPerMember > MAX_ALLOCATIONS_PER_MEMBER
+        ) {
+            revert InvalidMaxAllocations();
+        }
         maxAllocationsPerMember = _maxAllocationsPerMember;
         emit MaxAllocationsPerMemberSet(_maxAllocationsPerMember);
     }
@@ -94,10 +99,10 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
      * @param _member Address of the new council member
      * @param _votingPower Voting power of the new council member
      */
-    function addCouncilMember(
-        address _member,
-        uint256 _votingPower
-    ) public onlyRole(MEMBER_MANAGER_ROLE) {
+    function addCouncilMember(address _member, uint256 _votingPower)
+        public
+        onlyRole(MEMBER_MANAGER_ROLE)
+    {
         if (balanceOf(_member) > 0) revert CouncilMemberAlreadyAdded();
         if (_votingPower == 0) revert AmountMustBeGreaterThanZero();
         if (_votingPower > 1e6) revert VotingPowerTooHigh();
@@ -109,9 +114,10 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
      * @notice Remove a council member
      * @param _member Address of the council member to remove
      */
-    function removeCouncilMember(
-        address _member
-    ) public onlyRole(MEMBER_MANAGER_ROLE) {
+    function removeCouncilMember(address _member)
+        public
+        onlyRole(MEMBER_MANAGER_ROLE)
+    {
         if (balanceOf(_member) == 0) revert CouncilMemberNotFound();
         _burn(_member, balanceOf(_member));
         _setAllocation(
@@ -126,10 +132,10 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
      * @param _name Name of the grantee
      * @param _grantee Address of the grantee
      */
-    function addGrantee(
-        string memory _name,
-        address _grantee
-    ) public onlyRole(GRANTEE_MANAGER_ROLE) {
+    function addGrantee(string memory _name, address _grantee)
+        public
+        onlyRole(GRANTEE_MANAGER_ROLE)
+    {
         if (isGrantee(_grantee)) revert GranteeAlreadyAdded();
         _addGrantee(_grantee);
         emit GranteeAdded(_name, _grantee);
@@ -139,9 +145,10 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
      * @notice Remove a grantee
      * @param _grantee Address of the grantee to remove
      */
-    function removeGrantee(
-        address _grantee
-    ) public onlyRole(GRANTEE_MANAGER_ROLE) {
+    function removeGrantee(address _grantee)
+        public
+        onlyRole(GRANTEE_MANAGER_ROLE)
+    {
         _removeGrantee(_grantee);
         emit GranteeRemoved(_grantee);
     }
@@ -153,18 +160,22 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
     function allocateBudget(Allocation memory _allocation) public {
         uint256 balance = balanceOf(msg.sender);
         if (balance == 0) revert CouncilMemberNotFound();
-        if (_allocation.accounts.length > maxAllocationsPerMember)
+        if (_allocation.accounts.length > maxAllocationsPerMember) {
             revert TooManyAllocations();
-        if (_allocation.accounts.length != _allocation.amounts.length)
+        }
+        if (_allocation.accounts.length != _allocation.amounts.length) {
             revert ArraysLengthMismatch();
+        }
         uint256 _totalAllocatedBySender = 0;
         for (uint256 i = 0; i < _allocation.accounts.length; i++) {
-            if (_allocation.amounts[i] == 0)
+            if (_allocation.amounts[i] == 0) {
                 revert AmountMustBeGreaterThanZero();
+            }
             _totalAllocatedBySender += _allocation.amounts[i];
         }
-        if (_totalAllocatedBySender > balance)
+        if (_totalAllocatedBySender > balance) {
             revert TotalAllocatedExceedsBalance();
+        }
         _setAllocation(msg.sender, _allocation);
         emit BudgetAllocated(msg.sender, _allocation);
     }
@@ -190,9 +201,7 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
      * @return sum Total amount allocated by the member
      * @return balance Voting power balance of the member
      */
-    function getAllocation(
-        address _member
-    )
+    function getAllocation(address _member)
         public
         view
         returns (Allocation memory allocation, uint256 sum, uint256 balance)

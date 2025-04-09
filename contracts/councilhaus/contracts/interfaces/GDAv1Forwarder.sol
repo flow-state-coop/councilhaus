@@ -19,7 +19,6 @@ struct PoolConfig {
  * by protocol governance.
  */
 interface GDAv1Forwarder {
-
     /**
      * @dev Creates a new Superfluid Pool.
      * @param token The Super Token address.
@@ -28,11 +27,9 @@ interface GDAv1Forwarder {
      * @return success A boolean value indicating whether the pool was created successfully.
      * @return pool The address of the deployed Superfluid Pool
      */
-    function createPool(
-        address token,
-        address admin,
-        PoolConfig memory config
-    ) external returns (bool success, address pool);
+    function createPool(address token, address admin, PoolConfig memory config)
+        external
+        returns (bool success, address pool);
 
     /**
      * @dev Updates the units of a pool member.
@@ -66,10 +63,9 @@ interface GDAv1Forwarder {
      * @param userData User-specific data.
      * @return A boolean value indicating whether the connection was successful.
      */
-    function connectPool(
-        address pool,
-        bytes memory userData
-    ) external returns (bool);
+    function connectPool(address pool, bytes memory userData)
+        external
+        returns (bool);
 
     /**
      * @dev Disconnects a pool member from `pool`.
@@ -77,10 +73,9 @@ interface GDAv1Forwarder {
      * @param userData User-specific data.
      * @return A boolean value indicating whether the disconnection was successful.
      */
-    function disconnectPool(
-        address pool,
-        bytes memory userData
-    ) external returns (bool);
+    function disconnectPool(address pool, bytes memory userData)
+        external
+        returns (bool);
 
     /**
      * @dev Tries to distribute `requestedAmount` amount of `token` from `from` to `pool`.
@@ -122,10 +117,10 @@ interface GDAv1Forwarder {
      * @param account The account address to check.
      * @return A boolean value indicating whether the account is a pool.
      */
-    function isPool(
-        address token,
-        address account
-    ) external view returns (bool);
+    function isPool(address token, address account)
+        external
+        view
+        returns (bool);
 
     /**
      * @dev Gets the GDA net flow rate for the specified account.
@@ -133,10 +128,10 @@ interface GDAv1Forwarder {
      * @param account The account address.
      * @return The gda net flow rate for the account.
      */
-    function getNetFlow(
-        address token,
-        address account
-    ) external view returns (int96);
+    function getNetFlow(address token, address account)
+        external
+        view
+        returns (int96);
 
     /**
      * @dev Gets the flow rate of tokens between the specified accounts.
@@ -156,9 +151,10 @@ interface GDAv1Forwarder {
      * @param pool The pool address.
      * @return The pool adjustment flow rate.
      */
-    function getPoolAdjustmentFlowRate(
-        address pool
-    ) external view returns (int96);
+    function getPoolAdjustmentFlowRate(address pool)
+        external
+        view
+        returns (int96);
 
     /**
      * @dev Estimates the actual flow rate for flow distribution to the specified pool.
@@ -200,17 +196,18 @@ interface GDAv1Forwarder {
      * @param member The member address.
      * @return A boolean value indicating whether the member is connected to the pool.
      */
-    function isMemberConnected(
-        address pool,
-        address member
-    ) external view returns (bool);
+    function isMemberConnected(address pool, address member)
+        external
+        view
+        returns (bool);
 
     /**
      * @dev Gets the pool adjustment flow information for the specified pool.
      * @param pool The pool address.
      * @return The pool admin, pool ID, and pool adjustment flow rate.
      */
-    function getPoolAdjustmentFlowInfo(
-        address pool
-    ) external view returns (address, bytes32, int96);
+    function getPoolAdjustmentFlowInfo(address pool)
+        external
+        view
+        returns (address, bytes32, int96);
 }

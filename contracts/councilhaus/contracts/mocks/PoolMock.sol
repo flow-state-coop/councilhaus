@@ -14,14 +14,21 @@ contract PoolMock {
     bool public distributionFromAnyAddress;
     uint128 public totalUnits;
 
-    constructor(address _superToken, address _admin, PoolConfig memory _config) {
+    constructor(
+        address _superToken,
+        address _admin,
+        PoolConfig memory _config
+    ) {
         superToken = _superToken;
         admin = _admin;
         transferabilityForUnitsOwner = _config.transferabilityForUnitsOwner;
         distributionFromAnyAddress = _config.distributionFromAnyAddress;
     }
 
-    function updateMemberUnits(address memberAddr, uint128 newUnits) external returns (bool) {
+    function updateMemberUnits(address memberAddr, uint128 newUnits)
+        external
+        returns (bool)
+    {
         totalUnits -= units[memberAddr];
         units[memberAddr] = newUnits;
         totalUnits += newUnits;

@@ -58,8 +58,7 @@ describe("CouncilFactory Contract Tests", () => {
       const { councilFactory, addr1, addr2, councilFromTx } =
         await loadFixture(deploy);
       const config = {
-        councilName: "Spacing Guild",
-        councilSymbol: "SPA",
+        metadata: "TEST",
         councilMembers: [
           { account: addr1, votingPower: 500000n },
           { account: addr2, votingPower: 1000000n },
