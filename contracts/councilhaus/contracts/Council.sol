@@ -10,6 +10,12 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {PoolManager} from "./PoolManager.sol";
 import {NonTransferableToken} from "./NonTransferableToken.sol";
 
+// Council members can cast votes
+struct Member {
+    address member;
+    uint256 votingPower;
+}
+
 // Define the Allocation struct to represent budget allocations
 struct Allocation {
     address[] accounts;
@@ -43,7 +49,6 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
     event Withdrawn(address token, address account, uint256 amount);
 
     // Constants
-    uint8 public constant MAX_ALLOCATIONS_PER_MEMBER = 10;
     bytes32 public constant MEMBER_MANAGER_ROLE =
         keccak256("MEMBER_MANAGER_ROLE");
     bytes32 public constant GRANTEE_MANAGER_ROLE =
@@ -70,7 +75,6 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
     {
         metadata = _metadata;
         gdav1Forwarder = _gdav1Forwarder;
-        maxAllocationsPerMember = MAX_ALLOCATIONS_PER_MEMBER;
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MEMBER_MANAGER_ROLE, msg.sender);
         _grantRole(GRANTEE_MANAGER_ROLE, msg.sender);
@@ -84,10 +88,7 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
-        if (
-            _maxAllocationsPerMember <= 0
-                || _maxAllocationsPerMember > MAX_ALLOCATIONS_PER_MEMBER
-        ) {
+        if (_maxAllocationsPerMember < 0) {
             revert InvalidMaxAllocations();
         }
         maxAllocationsPerMember = _maxAllocationsPerMember;
@@ -128,6 +129,27 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
     }
 
     /**
+     * @notice Updates the council members and max allocation
+     *         Can only add or remove members, not modify current voting power
+     * @param _members The members of the council
+     * @param _maxAllocationsPerMember The max alllocation per member
+     */
+    function updateCouncilMembership(
+        Member[] memory _members,
+        uint8 _maxAllocationsPerMember
+    ) external onlyRole(MEMBER_MANAGER_ROLE) {
+        for (uint256 i = 0; i < _members.length; i++) {
+            if (_members[i].votingPower == 0) {
+                removeCouncilMember(_members[i].member);
+            } else {
+                addCouncilMember(_members[i].member, _members[i].votingPower);
+            }
+        }
+
+        setMaxAllocationsPerMember(_maxAllocationsPerMember);
+    }
+
+    /**
      * @notice Add a new grantee
      * @param _name Name of the grantee
      * @param _grantee Address of the grantee
@@ -160,7 +182,10 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
     function allocateBudget(Allocation memory _allocation) public {
         uint256 balance = balanceOf(msg.sender);
         if (balance == 0) revert CouncilMemberNotFound();
-        if (_allocation.accounts.length > maxAllocationsPerMember) {
+        if (
+            maxAllocationsPerMember > 0
+                && _allocation.accounts.length > maxAllocationsPerMember
+        ) {
             revert TooManyAllocations();
         }
         if (_allocation.accounts.length != _allocation.amounts.length) {

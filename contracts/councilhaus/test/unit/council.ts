@@ -45,7 +45,7 @@ describe("Council Contract Tests", () => {
       expect(await council.read.gdav1Forwarder()).to.equal(
         getAddress(gdav1Forwarder.address),
       );
-      expect(await council.read.maxAllocationsPerMember()).to.equal(10);
+      expect(await council.read.maxAllocationsPerMember()).to.equal(0);
     });
     it("should revert if the pool cannot be created", async () => {
       const { gdav1Forwarder } = await loadFixture(deploy);
@@ -155,6 +155,35 @@ describe("Council Contract Tests", () => {
       );
     });
 
+    it("Should allow MEMBER_MANAGER_ROLE to update council membership", async () => {
+      const { council, addr1, addr2, publicClient } = await loadFixture(deploy);
+      await council.write.addCouncilMember([addr1, 100n]);
+      const tx = await council.write.updateCouncilMembership([
+        [
+          { member: addr1, votingPower: 0n },
+          { member: addr2, votingPower: 100n },
+        ],
+        0n,
+      ]);
+      await expectEvent(
+        tx,
+        publicClient,
+        "CouncilMemberRemoved(address member)",
+        {
+          member: getAddress(addr1),
+        },
+      );
+      await expectEvent(
+        tx,
+        publicClient,
+        "CouncilMemberAdded(address member, uint256 votingPower)",
+        {
+          member: getAddress(addr2),
+          votingPower: 100n,
+        },
+      );
+    });
+
     it("Should remove a council member allocation when the council member is removed", async () => {
       const { council, pool, addr1 } = await loadFixture(deploy);
       await council.write.addCouncilMember([addr1, 100n]);
@@ -237,20 +266,6 @@ describe("Council Contract Tests", () => {
           maxAllocationsPerMember: 10,
         },
       );
-    });
-
-    it("Should revert if the max allocations per member is set to 0", async () => {
-      const { council } = await loadFixture(deploy);
-      await expect(
-        council.write.setMaxAllocationsPerMember([0]),
-      ).to.be.rejectedWith("InvalidMaxAllocations");
-    });
-
-    it("Should revert if the max allocations per member is set to a value greater than MAX_ALLOCATIONS_PER_MEMBER", async () => {
-      const { council } = await loadFixture(deploy);
-      await expect(
-        council.write.setMaxAllocationsPerMember([100]),
-      ).to.be.rejectedWith("InvalidMaxAllocations");
     });
 
     it("Should revert if the max allocations per member is set by a non-admin", async () => {

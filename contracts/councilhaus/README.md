@@ -14,7 +14,7 @@
 <tbody>
     <tr>
         <td>Council Factory</td>
-        <td>0x5B09db8C69eb59e65d50C4D8e2427F65eaA71ab8</td>
+        <td>0xc0A2D43D6F86A2E1bbE9C0E7B55774Bd296Ea821</td>
     </tr>
 </tbody>
 </table>
