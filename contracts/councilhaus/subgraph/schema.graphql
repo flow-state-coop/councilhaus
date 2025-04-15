@@ -15,15 +15,13 @@ type CouncilMember @entity {
   account: Bytes!
   votingPower: BigInt!
   council: Council!
-  enabled: Boolean!
 }
 
 type Grantee @entity {
   id: ID!
-  name: String!
+  metadata: String!
   account: Bytes!
   council: Council!
-  enabled: Boolean!
 }
 
 type Allocation @entity {

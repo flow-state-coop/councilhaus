@@ -1,5 +1,5 @@
 import { BigInt } from "@graphprotocol/graph-ts";
-import { log } from "@graphprotocol/graph-ts";
+import { log, store } from "@graphprotocol/graph-ts";
 import {
   Allocation,
   Council,
@@ -23,7 +23,6 @@ export function handleCouncilMemberAdded(event: CouncilMemberAdded): void {
   councilMember.account = event.params.member;
   councilMember.votingPower = event.params.votingPower;
   councilMember.council = event.address.toHex(); // Linking to the council
-  councilMember.enabled = true;
 
   councilMember.save();
 }
@@ -31,16 +30,8 @@ export function handleCouncilMemberAdded(event: CouncilMemberAdded): void {
 // Handle council member removed
 export function handleCouncilMemberRemoved(event: CouncilMemberRemoved): void {
   const councilMemberId = `${event.address.toHex()}-${event.params.member.toHex()}`;
-  const councilMember = CouncilMember.load(councilMemberId);
-  if (councilMember) {
-    councilMember.votingPower = new BigInt(0);
-    councilMember.enabled = false;
-    councilMember.save();
-  } else {
-    log.warning("Council member not found, skipping removal", [
-      councilMemberId,
-    ]);
-  }
+
+  store.remove("CouncilMember", councilMemberId);
 }
 
 // Handle grantee added
@@ -48,27 +39,18 @@ export function handleGranteeAdded(event: GranteeAdded): void {
   const grantee = new Grantee(
     `${event.address.toHex()}-${event.params.grantee.toHex()}`,
   );
-  grantee.name = event.params.name;
+  grantee.metadata = event.params.metadata;
   grantee.account = event.params.grantee;
   grantee.council = event.address.toHex(); // Linking to the council
-  grantee.enabled = true;
 
   grantee.save();
 }
 
 // Handle grantee removed
 export function handleGranteeRemoved(event: GranteeRemoved): void {
-  const grantee = Grantee.load(
-    `${event.address.toHex()}-${event.params.grantee.toHex()}`,
-  );
-  if (grantee) {
-    grantee.enabled = false;
-    grantee.save();
-  } else {
-    log.warning("Grantee not found, skipping removal", [
-      event.params.grantee.toHex(),
-    ]);
-  }
+  const granteeId = `${event.address.toHex()}-${event.params.grantee.toHex()}`;
+
+  store.remove("Grantee", granteeId);
 }
 
 // Handle budget allocated

@@ -325,6 +325,39 @@ describe("Council Contract Tests", () => {
       expect(await council.read.totalAllocated()).to.equal(0n);
     });
 
+    it("Should allow GRANTEE_MANAGER_ROLE to update council grantees", async () => {
+      const { council, addr1, addr2, publicClient } = await loadFixture(deploy);
+      await council.write.addCouncilMember([addr1, 100n]);
+      let tx = await council.write.updateCouncilGrantees([
+        [
+          { account: addr1, metadata: "", status: 0n },
+          { account: addr2, metadata: "", status: 0n },
+        ],
+      ]);
+      await expectEvent(
+        tx,
+        publicClient,
+        "GranteeAdded(string metadata, address grantee)",
+        {
+          metadata: "",
+          grantee: getAddress(addr1),
+        },
+      );
+      tx = await council.write.updateCouncilGrantees([
+        [
+          { account: addr1, metadata: "", status: 1n },
+        ],
+      ]);
+      await expectEvent(
+        tx,
+        publicClient,
+        "GranteeRemoved(address grantee)",
+        {
+          grantee: getAddress(addr1),
+        },
+      );
+    });
+
     it("Should not preserve a previous allocation when a grantee is removed", async () => {
       const { council, addr1, addr2 } = await loadFixture(deploy);
       await council.write.addCouncilMember([addr1, 100n]);

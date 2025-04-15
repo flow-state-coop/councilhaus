@@ -22,6 +22,19 @@ struct Allocation {
     uint128[] amounts;
 }
 
+// @notice The grantee structure
+struct Grantee {
+    address account;
+    string metadata;
+    GranteeStatus status;
+}
+
+/// @notice The status a grantee should have
+enum GranteeStatus {
+    Added,
+    Removed
+}
+
 /**
  * @title Council
  * @dev A contract for managing a council with voting power, budget allocation, and grantee management
@@ -43,7 +56,7 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
     event MaxAllocationsPerMemberSet(uint8 maxAllocationsPerMember);
     event CouncilMemberAdded(address member, uint256 votingPower);
     event CouncilMemberRemoved(address member);
-    event GranteeAdded(string name, address grantee);
+    event GranteeAdded(string metadata, address grantee);
     event GranteeRemoved(address grantee);
     event BudgetAllocated(address member, Allocation allocation);
     event Withdrawn(address token, address account, uint256 amount);
@@ -151,16 +164,16 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
 
     /**
      * @notice Add a new grantee
-     * @param _name Name of the grantee
+     * @param _metadata metadata of the grantee
      * @param _grantee Address of the grantee
      */
-    function addGrantee(string memory _name, address _grantee)
+    function addGrantee(string memory _metadata, address _grantee)
         public
         onlyRole(GRANTEE_MANAGER_ROLE)
     {
         if (isGrantee(_grantee)) revert GranteeAlreadyAdded();
         _addGrantee(_grantee);
-        emit GranteeAdded(_name, _grantee);
+        emit GranteeAdded(_metadata, _grantee);
     }
 
     /**
@@ -173,6 +186,23 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
     {
         _removeGrantee(_grantee);
         emit GranteeRemoved(_grantee);
+    }
+
+    /**
+     * @notice Updates the council grantees
+     * @param _grantees The grantees to add or remove
+     */
+    function updateCouncilGrantees(Grantee[] memory _grantees)
+        external
+        onlyRole(GRANTEE_MANAGER_ROLE)
+    {
+        for (uint256 i = 0; i < _grantees.length; i++) {
+            if (_grantees[i].status == GranteeStatus.Removed) {
+                removeGrantee(_grantees[i].account);
+            } else {
+                addGrantee(_grantees[i].metadata, _grantees[i].account);
+            }
+        }
     }
 
     /**
