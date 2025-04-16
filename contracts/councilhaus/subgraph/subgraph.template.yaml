@@ -45,10 +45,15 @@ templates:
         - CouncilMember
         - Grantee
         - Budget
+        - CouncilManager
       abis:
         - name: Council
           file: ./abis/Council.json
       eventHandlers:
+        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleGranted
+        - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleRevoked
         - event: CouncilMemberAdded(address,uint256)
           handler: handleCouncilMemberAdded
         - event: CouncilMemberRemoved(address)

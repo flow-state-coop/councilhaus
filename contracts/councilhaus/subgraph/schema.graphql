@@ -7,6 +7,17 @@ type Council @entity {
   grantees: [Grantee!]! @derivedFrom(field: "council")
   allocations: [Allocation!]! @derivedFrom(field: "council")
   maxAllocationsPerMember: Int!
+  memberManagerRole: Bytes!
+  granteeManagerRole: Bytes!
+  councilManagers: [CouncilManager!]! @derivedFrom(field: "council")
+  createdAt: BigInt!
+}
+
+type CouncilManager @entity {
+  id: ID!
+  account: Bytes!
+  role: Bytes!
+  council: Council!
   createdAt: BigInt!
 }
 
