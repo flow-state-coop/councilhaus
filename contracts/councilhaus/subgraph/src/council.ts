@@ -20,7 +20,7 @@ import {
 
 export function handleRoleGranted(event: RoleGranted): void {
   const councilManager = new CouncilManager(
-    `${event.params.role.toHex()}-${event.params.account.toHex()}`,
+    `${event.address.toHex()}-${event.params.role.toHex()}-${event.params.account.toHex()}`,
   );
   const council = Council.load(event.address.toHex());
 
@@ -36,13 +36,13 @@ export function handleRoleGranted(event: RoleGranted): void {
   councilManager.account = event.params.account;
   councilManager.role = event.params.role;
   councilManager.council = council.id;
-  councilManager.createdAt = event.block.number;
+  councilManager.createdAt = event.block.timestamp;
 
   councilManager.save();
 }
 
 export function handleRoleRevoked(event: RoleRevoked): void {
-  const id = `${event.params.role.toHex()}-${event.params.account.toHex()}`;
+  const id = `${event.address.toHex()}-${event.params.role.toHex()}-${event.params.account.toHex()}`;
 
   store.remove("CouncilManager", id);
 }

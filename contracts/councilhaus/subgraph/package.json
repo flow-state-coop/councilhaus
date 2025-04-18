@@ -10,7 +10,7 @@
     "deploy:optimism": "source .env && graph deploy flow-council-optimism --node https://api.0xgraph.xyz/deploy --ipfs https://api.0xgraph.xyz/ipfs --deploy-key $GRAPH_DEPLOY_KEY",
     "deploy:base": "source .env && graph deploy flow-council-base --node https://api.0xgraph.xyz/deploy --ipfs https://api.0xgraph.xyz/ipfs --deploy-key $GRAPH_DEPLOY_KEY",
     "deploy:arbitrum-one": "source .env && graph deploy flow-council-arbitrum-one --node https://api.0xgraph.xyz/deploy --ipfs https://api.0xgraph.xyz/ipfs --deploy-key $GRAPH_DEPLOY_KEY",
-    "deploy:optimism-sepolia": "goldsky subgraph deploy flow-council-optimism-sepolia/0.0.4 --path .",
+    "deploy:optimism-sepolia": "source .env && graph deploy flow-council-optimism-sepolia --node https://api.0xgraph.xyz/deploy --ipfs https://api.0xgraph.xyz/ipfs --deploy-key $GRAPH_DEPLOY_KEY",
     "prepare:optimism": "mustache config/optimism.json subgraph.template.yaml > subgraph.yaml",
     "prepare:base": "mustache config/base.json subgraph.template.yaml > subgraph.yaml",
     "prepare:arbitrum-one": "mustache config/arbitrum-one.json subgraph.template.yaml > subgraph.yaml",
