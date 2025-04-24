@@ -143,7 +143,6 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
 
     /**
      * @notice Updates the council members and max allocation
-     *         Can only add or remove members, not modify current voting power
      * @param _members The members of the council
      * @param _maxAllocationsPerMember The max alllocation per member
      */
@@ -154,6 +153,9 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
         for (uint256 i = 0; i < _members.length; i++) {
             if (_members[i].votingPower == 0) {
                 removeCouncilMember(_members[i].member);
+            } else if (balanceOf(_members[i].member) > 0) {
+                removeCouncilMember(_members[i].member);
+                addCouncilMember(_members[i].member, _members[i].votingPower);
             } else {
                 addCouncilMember(_members[i].member, _members[i].votingPower);
             }
