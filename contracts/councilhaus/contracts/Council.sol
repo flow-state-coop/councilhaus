@@ -138,6 +138,10 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
             _member,
             Allocation({accounts: new address[](0), amounts: new uint128[](0)})
         );
+        emit BudgetAllocated(
+            _member,
+            Allocation({accounts: new address[](0), amounts: new uint128[](0)})
+        );
         emit CouncilMemberRemoved(_member);
     }
 
