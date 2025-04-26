@@ -58,6 +58,8 @@ templates:
           handler: handleCouncilMemberAdded
         - event: CouncilMemberRemoved(address)
           handler: handleCouncilMemberRemoved
+        - event: CouncilMemberEdited(address,uint256)
+          handler: handleCouncilMemberEdited
         - event: GranteeAdded(string,address)
           handler: handleGranteeAdded
         - event: GranteeRemoved(address)

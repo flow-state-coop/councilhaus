@@ -13,6 +13,7 @@ import {
   BudgetAllocated,
   CouncilMemberAdded,
   CouncilMemberRemoved,
+  CouncilMemberEdited,
   GranteeAdded,
   GranteeRemoved,
   MaxAllocationsPerMemberSet,
@@ -62,6 +63,21 @@ export function handleCouncilMemberRemoved(event: CouncilMemberRemoved): void {
   const councilMemberId = `${event.address.toHex()}-${event.params.member.toHex()}`;
 
   store.remove("CouncilMember", councilMemberId);
+}
+
+export function handleCouncilMemberEdited(event: CouncilMemberEdited): void {
+  const councilMemberId = `${event.address.toHex()}-${event.params.member.toHex()}`;
+  const councilMember = CouncilMember.load(councilMemberId);
+
+  if (!councilMember) {
+    log.warning("Council member not found for id {}", [councilMemberId]);
+
+    return;
+  }
+
+  councilMember.votingPower = event.params.votingPower;
+
+  councilMember.save();
 }
 
 export function handleGranteeAdded(event: GranteeAdded): void {

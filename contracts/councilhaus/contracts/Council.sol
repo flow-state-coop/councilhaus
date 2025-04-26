@@ -56,6 +56,7 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
     event MaxAllocationsPerMemberSet(uint8 maxAllocationsPerMember);
     event CouncilMemberAdded(address member, uint256 votingPower);
     event CouncilMemberRemoved(address member);
+    event CouncilMemberEdited(address member, uint256 votingPower);
     event GranteeAdded(string metadata, address grantee);
     event GranteeRemoved(address grantee);
     event BudgetAllocated(address member, Allocation allocation);
@@ -146,6 +147,23 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
     }
 
     /**
+     * @notice Change a council member voting power
+     * @param _member Address of the council member
+     * @param _votingPower New voting power of the council member
+     */
+    function editCouncilMember(address _member, uint256 _votingPower)
+        public
+        onlyRole(MEMBER_MANAGER_ROLE)
+    {
+        if (balanceOf(_member) == 0) revert CouncilMemberNotFound();
+
+        _burn(_member, balanceOf(_member));
+        _mint(_member, _votingPower);
+
+        emit CouncilMemberEdited(_member, _votingPower);
+    }
+
+    /**
      * @notice Updates the council members and max allocation
      * @param _members The members of the council
      * @param _maxAllocationsPerMember The max alllocation per member
@@ -158,8 +176,7 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
             if (_members[i].votingPower == 0) {
                 removeCouncilMember(_members[i].member);
             } else if (balanceOf(_members[i].member) > 0) {
-                removeCouncilMember(_members[i].member);
-                addCouncilMember(_members[i].member, _members[i].votingPower);
+                editCouncilMember(_members[i].member, _members[i].votingPower);
             } else {
                 addCouncilMember(_members[i].member, _members[i].votingPower);
             }
