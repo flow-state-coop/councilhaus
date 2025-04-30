@@ -156,6 +156,8 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
         onlyRole(MEMBER_MANAGER_ROLE)
     {
         if (balanceOf(_member) == 0) revert CouncilMemberNotFound();
+        if (_votingPower == 0) revert AmountMustBeGreaterThanZero();
+        if (_votingPower > 1e6) revert VotingPowerTooHigh();
 
         _burn(_member, balanceOf(_member));
         _mint(_member, _votingPower);
