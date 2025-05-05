@@ -344,18 +344,11 @@ describe("Council Contract Tests", () => {
         },
       );
       tx = await council.write.updateCouncilGrantees([
-        [
-          { account: addr1, metadata: "", status: 1n },
-        ],
+        [{ account: addr1, metadata: "", status: 1n }],
       ]);
-      await expectEvent(
-        tx,
-        publicClient,
-        "GranteeRemoved(address grantee)",
-        {
-          grantee: getAddress(addr1),
-        },
-      );
+      await expectEvent(tx, publicClient, "GranteeRemoved(address grantee)", {
+        grantee: getAddress(addr1),
+      });
     });
 
     it("Should not preserve a previous allocation when a grantee is removed", async () => {
@@ -421,6 +414,90 @@ describe("Council Contract Tests", () => {
       await expect(council.write.removeGrantee([addr2])).to.be.rejectedWith(
         "GranteeNotFound",
       );
+    });
+  });
+
+  describe("Council Managers", () => {
+    it("Should add another grantee manager", async () => {
+      const { council, addr2, publicClient } = await loadFixture(deploy);
+
+      const granteeManagerRole = await council.read.GRANTEE_MANAGER_ROLE();
+      const managers = [
+        {
+          account: addr2,
+          role: granteeManagerRole,
+          status: 0n,
+        },
+      ];
+      const tx = await council.write.updateCouncilManagers([managers]);
+      const hasRole = await council.read.hasRole([granteeManagerRole, addr2]);
+
+      expect(hasRole).to.equal(true);
+    });
+
+    it("Should remove another grantee manager", async () => {
+      const { council, addr1, publicClient } = await loadFixture(deploy);
+
+      const granteeManagerRole = await council.read.GRANTEE_MANAGER_ROLE();
+      const managers = [
+        {
+          account: addr1,
+          role: granteeManagerRole,
+          status: 1n,
+        },
+      ];
+      const tx = await council.write.updateCouncilManagers([managers]);
+      const hasRole = await council.read.hasRole([granteeManagerRole, addr1]);
+
+      expect(hasRole).to.equal(false);
+    });
+
+    it("Should add and remove another grantee manager", async () => {
+      const { council, addr1, addr2, publicClient } = await loadFixture(deploy);
+
+      const granteeManagerRole = await council.read.GRANTEE_MANAGER_ROLE();
+      const managers = [
+        {
+          account: addr1,
+          role: granteeManagerRole,
+          status: 1n,
+        },
+        {
+          account: addr2,
+          role: granteeManagerRole,
+          status: 0n,
+        },
+      ];
+      const tx = await council.write.updateCouncilManagers([managers]);
+      const hasRoleAddr1 = await council.read.hasRole([
+        granteeManagerRole,
+        addr1,
+      ]);
+      const hasRoleAddr2 = await council.read.hasRole([
+        granteeManagerRole,
+        addr2,
+      ]);
+
+      expect(hasRoleAddr1).to.equal(false);
+      expect(hasRoleAddr2).to.equal(true);
+    });
+
+    it("Should revert if sender isn't a role admin", async () => {
+      const { council, addr1, addr2 } = await loadFixture(deploy);
+      const defaultAdminRole = await council.read.DEFAULT_ADMIN_ROLE();
+      const memberManagerRole = await council.read.MEMBER_MANAGER_ROLE();
+
+      let managers = [
+        { account: addr1, role: defaultAdminRole, status: 1n },
+        { account: addr2, role: defaultAdminRole, status: 0n },
+      ];
+      let tx = await council.write.updateCouncilManagers([managers]);
+
+      managers = [{ account: addr2, role: memberManagerRole, status: 0n }];
+
+      await expect(
+        council.write.updateCouncilManagers([managers]),
+      ).to.be.rejectedWith("AccessControlUnauthorizedAccount");
     });
   });
 

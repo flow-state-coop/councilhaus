@@ -22,15 +22,22 @@ struct Allocation {
     uint128[] amounts;
 }
 
+// Council manager structure
+struct Manager {
+    address account;
+    bytes32 role;
+    Status status;
+}
+
 // @notice The grantee structure
 struct Grantee {
     address account;
     string metadata;
-    GranteeStatus status;
+    Status status;
 }
 
-/// @notice The status a grantee should have
-enum GranteeStatus {
+/// @notice The status an account should have
+enum Status {
     Added,
     Removed
 }
@@ -187,6 +194,25 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
         setMaxAllocationsPerMember(_maxAllocationsPerMember);
     }
 
+    /// @notice Update the council managers
+    /// @param _managers The address, role and status of the managers
+    function updateCouncilManagers(Manager[] memory _managers)
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        for (uint256 i; i < _managers.length;) {
+            if (_managers[i].status == Status.Added) {
+                _grantRole(_managers[i].role, _managers[i].account);
+            } else if (_managers[i].status == Status.Removed) {
+                _revokeRole(_managers[i].role, _managers[i].account);
+            }
+
+            unchecked {
+                i++;
+            }
+        }
+    }
+
     /**
      * @notice Add a new grantee
      * @param _metadata metadata of the grantee
@@ -222,7 +248,7 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
         onlyRole(GRANTEE_MANAGER_ROLE)
     {
         for (uint256 i = 0; i < _grantees.length; i++) {
-            if (_grantees[i].status == GranteeStatus.Removed) {
+            if (_grantees[i].status == Status.Removed) {
                 removeGrantee(_grantees[i].account);
             } else {
                 addGrantee(_grantees[i].metadata, _grantees[i].account);
