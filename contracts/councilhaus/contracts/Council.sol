@@ -107,7 +107,7 @@ contract Council is NonTransferableToken, AccessControl, PoolManager {
      */
     function setMaxAllocationsPerMember(uint8 _maxAllocationsPerMember)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(MEMBER_MANAGER_ROLE)
     {
         if (_maxAllocationsPerMember < 0) {
             revert InvalidMaxAllocations();
