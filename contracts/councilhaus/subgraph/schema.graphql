@@ -39,7 +39,12 @@ type Allocation @entity {
   id: ID!
   council: Council!
   councilMember: CouncilMember!
-  grantees: [Grantee!]!
-  amounts: [BigInt!]!
+  votes: [Vote!]!
   allocatedAt: BigInt!
+}
+
+type Vote @entity {
+  id: ID!
+  grantee: Grantee!
+  amount: BigInt!
 }

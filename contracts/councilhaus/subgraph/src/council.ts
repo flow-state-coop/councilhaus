@@ -6,6 +6,7 @@ import {
   CouncilMember,
   Grantee,
   CouncilManager,
+  Vote,
 } from "../generated/schema";
 import {
   RoleGranted,
@@ -115,10 +116,10 @@ export function handleBudgetAllocated(event: BudgetAllocated): void {
   allocation.council = event.address.toHex();
   allocation.councilMember = councilMember.id;
   allocation.allocatedAt = event.block.timestamp;
-  allocation.amounts = event.params.allocation.amounts;
 
-  const grantees: string[] = [];
+  const amounts = event.params.allocation.amounts;
   const accounts = event.params.allocation.accounts;
+  const votes: string[] = [];
 
   for (let i = 0; i < accounts.length; i++) {
     const grantee = Grantee.load(
@@ -132,10 +133,20 @@ export function handleBudgetAllocated(event: BudgetAllocated): void {
       return;
     }
 
-    grantees.push(grantee.id);
+    const vote = new Vote(
+      `${event.params.member.toHex()}-${grantee.account}-${
+        event.block.timestamp
+      }`,
+    );
+
+    vote.grantee = grantee.id;
+    vote.amount = amounts[i];
+
+    vote.save();
+    votes.push(vote.id);
   }
 
-  allocation.grantees = grantees;
+  allocation.votes = votes;
   allocation.save();
 }
 
