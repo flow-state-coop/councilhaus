@@ -117,40 +117,40 @@ abstract contract PoolManager {
     function _setAllocation(address _member, Allocation memory _newAllocation)
         internal
     {
-        // First, remove old allocations from the pool
+        uint256[] memory granteeIdsArray =
+            new uint256[](_newAllocation.accounts.length);
         InternalAllocation storage _allocation = _internalAllocations[_member];
+
+        for (uint256 i = 0; i < _newAllocation.accounts.length; i++) {
+            address granteeAddress = _newAllocation.accounts[i];
+            uint256 granteeId = granteeIds[granteeAddress];
+
+            if (granteeId == 0) revert GranteeNotFound();
+
+            granteeIdsArray[i] = granteeId;
+
+            pool.updateMemberUnits(
+                granteeAddress,
+                pool.getUnits(granteeAddress) + _newAllocation.amounts[i]
+            );
+        }
+
         for (uint256 i = 0; i < _allocation.granteeIds.length; i++) {
             if (granteeAddresses[_allocation.granteeIds[i]] != address(0)) {
                 address granteeAddress =
                     granteeAddresses[_allocation.granteeIds[i]];
+
                 pool.updateMemberUnits(
                     granteeAddress,
                     pool.getUnits(granteeAddress) - _allocation.amounts[i]
                 );
             }
         }
-        // Map new allocation addresses to grantee IDs
-        uint256[] memory granteeIdsArray =
-            new uint256[](_newAllocation.accounts.length);
-        for (uint256 i = 0; i < _newAllocation.accounts.length; i++) {
-            address granteeAddress = _newAllocation.accounts[i];
-            uint256 granteeId = granteeIds[granteeAddress];
-            if (granteeId == 0) revert GranteeNotFound();
-            granteeIdsArray[i] = granteeId;
-        }
-        // Set the new internal allocation
+
         _internalAllocations[_member] = InternalAllocation({
             granteeIds: granteeIdsArray,
             amounts: _newAllocation.amounts
         });
-        // Update the pool units with the new allocation
-        for (uint256 i = 0; i < granteeIdsArray.length; i++) {
-            address granteeAddress = granteeAddresses[granteeIdsArray[i]];
-            pool.updateMemberUnits(
-                granteeAddress,
-                pool.getUnits(granteeAddress) + _newAllocation.amounts[i]
-            );
-        }
     }
 
     // @notice Total allocated units

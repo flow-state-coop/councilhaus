@@ -43,7 +43,7 @@ In order to verify the contracts, follow the steps below:
 <tbody>
     <tr>
         <td>Council Factory</td>
-        <td>0xe448a8926aeebd43ecd93c8f775a1a3115e0933b</td>
+        <td>0x0037c884f51714fEA8194E3C0c547894736bF8F2</td>
     </tr>
 </tbody>
 </table>
