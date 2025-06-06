@@ -31,6 +31,23 @@ In order to verify the contracts, follow the steps below:
 
 ## Contract Deployments
 
+### Base
+
+<table>
+<thead>
+    <tr>
+        <th>Contract</th>
+        <th>Address</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Council Factory</td>
+        <td>0x73DD388BC769eD4975Cb4e6Cfd9a5b9474082875</td>
+    </tr>
+</tbody>
+</table>
+
 ### Optimism Sepolia
 
 <table>
