@@ -31,6 +31,23 @@ In order to verify the contracts, follow the steps below:
 
 ## Contract Deployments
 
+### Arbitrum
+
+<table>
+<thead>
+    <tr>
+        <th>Contract</th>
+        <th>Address</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Council Factory</td>
+        <td>0xe6a6E24905e200F69b57cE3B01D5F65776a40DF3</td>
+    </tr>
+</tbody>
+</table>
+
 ### Base
 
 <table>

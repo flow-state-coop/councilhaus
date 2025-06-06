@@ -1,5 +1,5 @@
 {
-  "network": "base",
-  "address": "0xdef306E171B39101cf133747f391E5e1A49C8948",
-  "startBlock": 20194188
+  "network": "arbitrum-one",
+  "address": "0xe6a6E24905e200F69b57cE3B01D5F65776a40DF3",
+  "startBlock": 344451952
 }
