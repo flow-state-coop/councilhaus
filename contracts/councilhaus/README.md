@@ -48,6 +48,23 @@ In order to verify the contracts, follow the steps below:
 </tbody>
 </table>
 
+### Optimism
+
+<table>
+<thead>
+    <tr>
+        <th>Contract</th>
+        <th>Address</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Council Factory</td>
+        <td>0xeba33Eb3B2aa36EC81390b4e10b4f61b555f194b</td>
+    </tr>
+</tbody>
+</table>
+
 ### Optimism Sepolia
 
 <table>
