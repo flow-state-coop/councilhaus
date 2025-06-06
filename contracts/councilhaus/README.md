@@ -65,6 +65,24 @@ In order to verify the contracts, follow the steps below:
 </tbody>
 </table>
 
+### Celo
+
+<table>
+<thead>
+    <tr>
+        <th>Contract</th>
+        <th>Address</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Council Factory</td>
+        <td>0x25B64C200cf3362BaC6961353D38A1dbEB42e60E</td>
+    </tr>
+</tbody>
+</table>
+
+
 ### Optimism
 
 <table>
