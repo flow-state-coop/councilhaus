@@ -23,7 +23,9 @@ export function handleCouncilCreated(event: CouncilCreatedEvent): void {
   entity.pool = event.params.pool;
   entity.distributionToken = councilContract.distributionToken();
   entity.maxAllocationsPerMember = councilContract.maxAllocationsPerMember();
-  entity.createdAt = event.block.timestamp;
+  entity.councilMembersCount = 0;
+  entity.createdAtBlock = event.block.number;
+  entity.createdAtTimestamp = event.block.timestamp;
 
   entity.save();
 

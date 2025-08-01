@@ -38,7 +38,8 @@ export function handleRoleGranted(event: RoleGranted): void {
   councilManager.account = event.params.account;
   councilManager.role = event.params.role;
   councilManager.council = council.id;
-  councilManager.createdAt = event.block.timestamp;
+  councilManager.createdAtBlock = event.block.number;
+  councilManager.createdAtTimestamp = event.block.timestamp;
 
   councilManager.save();
 }
@@ -50,20 +51,50 @@ export function handleRoleRevoked(event: RoleRevoked): void {
 }
 
 export function handleCouncilMemberAdded(event: CouncilMemberAdded): void {
+  const councilId = event.address.toHex();
   const councilMember = new CouncilMember(
-    `${event.address.toHex()}-${event.params.member.toHex()}`,
+    `${councilId}-${event.params.member.toHex()}`,
   );
+  const council = Council.load(councilId);
+
+  if (!council) {
+    log.warning("Council not found for member {}, council {}", [
+      event.params.member.toHex(),
+      councilId,
+    ]);
+
+    return;
+  }
+
   councilMember.account = event.params.member;
   councilMember.votingPower = event.params.votingPower;
-  councilMember.council = event.address.toHex();
+  councilMember.council = councilId;
+  councilMember.createdAtTimestamp = event.block.timestamp;
+  councilMember.createdAtBlock = event.block.number;
+  council.councilMembersCount = council.councilMembersCount + 1;
 
   councilMember.save();
+  council.save();
 }
 
 export function handleCouncilMemberRemoved(event: CouncilMemberRemoved): void {
-  const councilMemberId = `${event.address.toHex()}-${event.params.member.toHex()}`;
+  const councilId = event.address.toHex();
+  const councilMemberId = `${councilId}-${event.params.member.toHex()}`;
+  const council = Council.load(councilId);
+
+  if (!council) {
+    log.warning("Council not found for member {}, council {}", [
+      event.params.member.toHex(),
+      councilId,
+    ]);
+
+    return;
+  }
+
+  council.councilMembersCount = council.councilMembersCount - 1;
 
   store.remove("CouncilMember", councilMemberId);
+  council.save();
 }
 
 export function handleCouncilMemberEdited(event: CouncilMemberEdited): void {
@@ -88,6 +119,8 @@ export function handleGranteeAdded(event: GranteeAdded): void {
   grantee.metadata = event.params.metadata;
   grantee.account = event.params.grantee;
   grantee.council = event.address.toHex();
+  grantee.createdAtTimestamp = event.block.timestamp;
+  grantee.createdAtBlock = event.block.number;
 
   grantee.save();
 }
@@ -115,7 +148,8 @@ export function handleBudgetAllocated(event: BudgetAllocated): void {
 
   allocation.council = event.address.toHex();
   allocation.councilMember = councilMember.id;
-  allocation.allocatedAt = event.block.timestamp;
+  allocation.createdAtBlock = event.block.number;
+  allocation.createdAtTimestamp = event.block.timestamp;
 
   const amounts = event.params.allocation.amounts;
   const accounts = event.params.allocation.accounts;
@@ -134,13 +168,16 @@ export function handleBudgetAllocated(event: BudgetAllocated): void {
     }
 
     const vote = new Vote(
-      `${event.params.member.toHex()}-${grantee.account}-${
+      `${event.params.member.toHex()}-${grantee.account.toHex()}-${
         event.block.timestamp
       }`,
     );
 
     vote.grantee = grantee.id;
+    vote.votedBy = event.params.member;
     vote.amount = amounts[i];
+    vote.createdAtBlock = event.block.number;
+    vote.createdAtTimestamp = event.block.timestamp;
 
     vote.save();
     votes.push(vote.id);
@@ -148,6 +185,9 @@ export function handleBudgetAllocated(event: BudgetAllocated): void {
 
   allocation.votes = votes;
   allocation.save();
+
+  councilMember.allocation = allocation.id;
+  councilMember.save();
 }
 
 export function handleMaxAllocationsPerMemberSet(
